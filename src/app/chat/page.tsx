@@ -3229,89 +3229,137 @@ export default function ChatPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <Card className="border-0 shadow-lg h-[700px] flex flex-col">
-            <CardHeader className="border-b border-gray-200">
+          <Card className="border-0 shadow-2xl h-[700px] flex flex-col bg-gradient-to-br from-white via-purple-50/30 to-blue-50/30 backdrop-blur-sm">
+            <CardHeader className="border-b border-gradient-to-r from-purple-200 via-pink-200 to-blue-200 bg-gradient-to-r from-purple-600/5 via-pink-600/5 to-blue-600/5">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg text-gray-900">
-                  Conversation
-                </CardTitle>
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <Sparkles className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                      TradeGenie AI
+                    </CardTitle>
+                    <p className="text-sm text-gray-500">Your intelligent trade assistant</p>
+                  </div>
+                </div>
                 <div className="flex items-center space-x-2">
+                  <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg">
+                    <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse" />
+                    Live
+                  </Badge>
                   <Badge
                     variant="secondary"
-                    className="bg-purple-100 text-purple-800"
+                    className="bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border border-purple-200"
                   >
                     <Sparkles className="w-3 h-3 mr-1" />
                     AI Powered
                   </Badge>
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-xs border-purple-200 bg-white/50">
                     {products.length}+ Products
                   </Badge>
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-xs border-purple-200 bg-white/50">
                     {countries.length}+ Countries
                   </Badge>
                 </div>
               </div>
             </CardHeader>
 
-            <CardContent className="flex-1 p-0">
-              <ScrollArea className="h-[520px] p-4">
-                <div className="space-y-4">
+            <CardContent className="flex-1 p-0 bg-gradient-to-b from-transparent to-purple-50/20">
+              <ScrollArea className="h-[520px] p-6">
+                <div className="space-y-6">
                   <AnimatePresence>
                     {messages.map((message) => (
                       <motion.div
                         key={message.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
+                        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -30, scale: 0.95 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
                         className={`flex ${
                           message.type === "user"
                             ? "justify-end"
                             : "justify-start"
                         }`}
                       >
-                        <div
-                          className={`max-w-[85%] rounded-lg p-4 ${
+                        <div className={`flex ${message.type === "user" ? "flex-row-reverse" : "flex-row"} items-start space-x-3 max-w-[85%]`}>
+                          {/* Avatar */}
+                          <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-lg ${
                             message.type === "user"
-                              ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white"
-                              : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-900 border border-gray-200"
-                          }`}
-                        >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-2 mb-2">
-                                {message.type === "assistant" &&
-                                  getCategoryIcon(message.category)}
-                                <span className="text-xs opacity-70">
-                                  {message.type === "user"
-                                    ? "You"
-                                    : "TradeGenie AI"}
-                                </span>
-                                <span className="text-xs opacity-50">
+                              ? "bg-gradient-to-br from-blue-500 to-cyan-500 ml-3"
+                              : "bg-gradient-to-br from-purple-600 to-pink-600 mr-3"
+                          }`}>
+                            {message.type === "user" ? (
+                              <span className="text-white font-bold text-sm">U</span>
+                            ) : (
+                              <Sparkles className="w-5 h-5 text-white" />
+                            )}
+                          </div>
+                          
+                          {/* Message Content */}
+                          <div
+                            className={`relative rounded-2xl p-5 shadow-lg backdrop-blur-sm border ${
+                              message.type === "user"
+                                ? "bg-gradient-to-br from-blue-500 to-cyan-500 text-white border-blue-300/50"
+                                : "bg-white/90 text-gray-800 border-gray-200/50 shadow-xl"
+                            }`}
+                          >
+                            {/* Message Tail */}
+                            <div className={`absolute top-4 w-3 h-3 transform rotate-45 ${
+                              message.type === "user"
+                                ? "bg-blue-500 -right-1.5"
+                                : "bg-white -left-1.5"
+                            }`} />
+                            
+                            <div className="relative">
+                              <div className="flex items-center space-x-2 mb-3">
+                                {message.type === "assistant" && (
+                                  <div className="flex items-center space-x-2">
+                                    {getCategoryIcon(message.category)}
+                                    <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700 border-purple-200">
+                                      AI Assistant
+                                    </Badge>
+                                  </div>
+                                )}
+                                {message.type === "user" && (
+                                  <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700 border-blue-200">
+                                    You
+                                  </Badge>
+                                )}
+                                <span className={`text-xs ${message.type === "user" ? "text-blue-100" : "text-gray-400"}`}>
                                   {formatTime(message.timestamp)}
                                 </span>
                               </div>
-                              {/* --- MODIFIED LINE HERE --- */}
-                              <p className="text-sm whitespace-pre-wrap leading-relaxed">
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                              
+                              <div className={`prose max-w-none ${message.type === "user" ? "prose-invert" : ""}`}>
+                                <ReactMarkdown 
+                                  remarkPlugins={[remarkGfm]}
+                                  className="text-sm leading-relaxed"
+                                >
                                   {message.content}
                                 </ReactMarkdown>
-                              </p>
-                              {/* --------------------------- */}
+                              </div>
+                              
+                              {/* Copy Button */}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className={`absolute top-2 right-2 p-2 h-auto opacity-60 hover:opacity-100 transition-opacity ${
+                                  message.type === "user" 
+                                    ? "text-white hover:bg-white/20" 
+                                    : "text-gray-400 hover:bg-gray-100"
+                                }`}
+                                onClick={() =>
+                                  handleCopyMessage(message.id, message.content)
+                                }
+                              >
+                                {copiedMessageId === message.id ? (
+                                  <Check className="w-4 h-4" />
+                                ) : (
+                                  <Copy className="w-4 h-4" />
+                                )}
+                              </Button>
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="ml-2 p-1 h-auto opacity-70 hover:opacity-100"
-                              onClick={() =>
-                                handleCopyMessage(message.id, message.content)
-                              }
-                            >
-                              {copiedMessageId === message.id ? (
-                                <Check className="w-4 h-4" />
-                              ) : (
-                                <Copy className="w-4 h-4" />
-                              )}
-                            </Button>
                           </div>
                         </div>
                       </motion.div>
@@ -3319,17 +3367,33 @@ export default function ChatPage() {
 
                     {isTyping && (
                       <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
+                        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ duration: 0.4 }}
                         className="flex justify-start"
                       >
-                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-900 rounded-lg p-4 max-w-[85%] border border-gray-200">
-                          <div className="flex items-center space-x-2">
-                            <Loader2 className="w-4 h-4 animate-spin text-purple-600" />
-                            <span className="text-sm">
-                              TradeGenie AI is analyzing your request...
-                            </span>
+                        <div className="flex items-start space-x-3 max-w-[85%]">
+                          {/* AI Avatar */}
+                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg mr-3">
+                            <Sparkles className="w-5 h-5 text-white" />
+                          </div>
+                          
+                          {/* Typing Indicator */}
+                          <div className="relative bg-white/90 text-gray-800 rounded-2xl p-5 shadow-xl backdrop-blur-sm border border-gray-200/50">
+                            {/* Message Tail */}
+                            <div className="absolute top-4 w-3 h-3 transform rotate-45 bg-white -left-1.5" />
+                            
+                            <div className="flex items-center space-x-3">
+                              <div className="flex space-x-1">
+                                <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                              </div>
+                              <span className="text-sm text-purple-600 font-medium">
+                                TradeGenie AI is thinking...
+                              </span>
+                              <Loader2 className="w-4 h-4 animate-spin text-purple-500" />
+                            </div>
                           </div>
                         </div>
                       </motion.div>
@@ -3340,40 +3404,94 @@ export default function ChatPage() {
               </ScrollArea>
             </CardContent>
 
-            <div className="border-t border-gray-200 p-4">
-              <div className="flex items-center space-x-2">
+            <div className="border-t border-gradient-to-r from-purple-200 via-pink-200 to-blue-200 bg-gradient-to-r from-purple-600/5 via-pink-600/5 to-blue-600/5 p-6">
+              <div className="flex items-center space-x-3">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleVoiceInput}
-                  className={`p-2 ${
-                    isRecording ? "bg-red-100 text-red-600 border-red-300" : ""
+                  className={`p-3 rounded-xl border-2 transition-all duration-300 ${
+                    isRecording 
+                      ? "bg-gradient-to-r from-red-500 to-pink-500 text-white border-red-300 shadow-lg" 
+                      : "bg-white/80 border-purple-200 text-purple-600 hover:bg-purple-50 hover:border-purple-300 shadow-sm"
                   }`}
                 >
                   {isRecording ? (
-                    <MicOff className="w-4 h-4" />
+                    <div className="flex items-center space-x-1">
+                      <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                      <MicOff className="w-4 h-4" />
+                    </div>
                   ) : (
                     <Mic className="w-4 h-4" />
                   )}
                 </Button>
-                <Input
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder="Ask about tariffs, risks, markets, or compliance..."
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSendMessage(inputMessage);
-                    }
-                  }}
-                  className="flex-1"
-                />
+                
+                <div className="flex-1 relative">
+                  <Input
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    placeholder="Ask about real-time trade data, tariffs, risks, markets, or compliance..."
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendMessage(inputMessage);
+                      }
+                    }}
+                    className="w-full px-6 py-4 rounded-2xl border-2 border-purple-200 bg-white/80 backdrop-blur-sm text-gray-800 placeholder-gray-400 shadow-lg focus:border-purple-400 focus:ring-4 focus:ring-purple-100 transition-all duration-300"
+                  />
+                  {inputMessage && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                    </div>
+                  )}
+                </div>
+                
                 <Button
                   onClick={() => handleSendMessage(inputMessage)}
                   disabled={!inputMessage.trim()}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                  className={`p-4 rounded-2xl transition-all duration-300 shadow-lg ${
+                    inputMessage.trim()
+                      ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-xl hover:shadow-2xl transform hover:scale-105"
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  }`}
                 >
-                  <Send className="w-4 h-4" />
+                  <Send className="w-5 h-5" />
+                </Button>
+              </div>
+              
+              {/* Quick Action Buttons */}
+              <div className="flex items-center justify-center space-x-2 mt-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setInputMessage("Show me real-time trade data")}
+                  className="text-xs px-3 py-1 rounded-full bg-purple-100 text-purple-700 hover:bg-purple-200 border border-purple-200"
+                >
+                  📊 Live Data
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setInputMessage("Give me a market summary")}
+                  className="text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 border border-blue-200"
+                >
+                  📈 Market Summary
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setInputMessage("Live cotton trade data")}
+                  className="text-xs px-3 py-1 rounded-full bg-green-100 text-green-700 hover:bg-green-200 border border-green-200"
+                >
+                  🌱 Cotton Data
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setInputMessage("What is the tariff for exporting electronics from China to USA?")}
+                  className="text-xs px-3 py-1 rounded-full bg-orange-100 text-orange-700 hover:bg-orange-200 border border-orange-200"
+                >
+                  🔍 Tariff Info
                 </Button>
               </div>
             </div>
