@@ -4,21 +4,11 @@ import { db } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("Registration API called");
     const body = await request.json();
-    console.log("Request body:", body);
-
     const { firstName, lastName, email, password, company, phone, role } = body;
 
     // Validate required fields
     if (!firstName || !lastName || !email || !password || !role) {
-      console.log("Missing required fields:", {
-        firstName,
-        lastName,
-        email,
-        password: !!password,
-        role,
-      });
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -26,13 +16,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already exists
-    console.log("Checking if user exists:", email);
     const existingUser = await db.user.findUnique({
       where: { email },
     });
 
     if (existingUser) {
-      console.log("User already exists:", email);
       return NextResponse.json(
         { error: "User with this email already exists" },
         { status: 409 }
@@ -40,11 +28,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash password
-    console.log("Hashing password...");
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Create user
-    console.log("Creating user...");
     const user = await db.user.create({
       data: {
         firstName,
@@ -71,8 +57,6 @@ export async function POST(request: NextRequest) {
         createdAt: true,
       },
     });
-
-    console.log("User created successfully:", user.id);
 
     return NextResponse.json(
       {

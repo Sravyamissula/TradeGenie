@@ -2046,7 +2046,7 @@ export default function ChatPage() {
       id: "1",
       type: "assistant",
       content:
-        "🌟 Welcome to TradeGenie AI! I'm your advanced trade assistant with access to 200+ products and 150+ countries. I can help you with:\n\n📊 **Tariff Analysis** - Get accurate tariff rates for any product-country combination\n⚠️ **Risk Assessment** - Comprehensive export risk analysis\n🎯 **Market Intelligence** - Profitable product recommendations\n📋 **Document Generation** - Trade document assistance\n🌍 **Compliance** - Regulatory requirements\n\nHow can I assist you today?",
+        "🌟 Welcome to TradeGenie AI! I'm your advanced trade assistant with access to 200+ products and 150+ countries. I can help you with:\n\n📊 **Real-Time Trade Data** - Live import/export activity and market insights\n📈 **Market Summary** - Global trade statistics and trending commodities\n🔍 **Tariff Analysis** - Get accurate tariff rates for any product-country combination\n⚠️ **Risk Assessment** - Comprehensive export risk analysis\n🎯 **Market Intelligence** - Profitable product recommendations\n📋 **Document Generation** - Trade document assistance\n🌍 **Compliance** - Regulatory requirements\n\n**Try asking:**\n• \"Show me real-time trade data\"\n• \"Give me a market summary\"\n• \"What's the tariff for exporting tea from India to USA?\"\n\nHow can I assist you today?",
       timestamp: new Date(),
       category: "general",
     },
@@ -2382,6 +2382,117 @@ export default function ChatPage() {
 
   const generateAIResponse = async (userInput: string): Promise<string> => {
     const input = userInput.toLowerCase();
+
+    // Check for real-time trade data queries
+    if (
+      input.includes("trade data") ||
+      input.includes("live trade") ||
+      input.includes("real-time trade") ||
+      input.includes("current trade") ||
+      input.includes("market data") ||
+      input.includes("trade activity") ||
+      input.includes("import export data") ||
+      input.includes("trade statistics") ||
+      input.includes("recent trades")
+    ) {
+      try {
+        const response = await fetch('/api/trade-data', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            query: userInput,
+            filters: {}
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch trade data');
+        }
+
+        const tradeResponse = await response.json();
+        const { data, insights, timestamp } = tradeResponse;
+
+        let tradeDataResponse = `📊 **Real-Time Trade Import/Export Data**\n\n`;
+        tradeDataResponse += `🕐 *Last updated: ${new Date(timestamp).toLocaleTimeString()}*\n\n`;
+        
+        if (data && data.length > 0) {
+          tradeDataResponse += `**Recent Trade Activities (${data.length} trades):**\n\n`;
+          
+          // Show top 10 trades
+          const topTrades = data.slice(0, 10);
+          topTrades.forEach((trade: any, index: number) => {
+            const valueInM = (trade.value / 1000000).toFixed(2);
+            const timeAgo = Math.floor((Date.now() - new Date(trade.timestamp).getTime()) / (1000 * 60 * 60));
+            
+            tradeDataResponse += `${index + 1}. **${trade.type.toUpperCase()}** - ${trade.commodity}\n`;
+            tradeDataResponse += `   📍 ${trade.origin} → ${trade.destination}\n`;
+            tradeDataResponse += `   💰 $${valueInM}M | 📦 ${trade.volume.toLocaleString()} ${trade.unit}\n`;
+            tradeDataResponse += `   📊 Risk: ${trade.riskScore}/100 | Tariff: ${trade.tariffRate}%\n`;
+            tradeDataResponse += `   📈 Trend: ${trade.trend === 'up' ? '↗️' : trade.trend === 'down' ? '↘️' : '➡️'} ${trade.changePercent}%\n`;
+            tradeDataResponse += `   ⏱️ ${timeAgo}h ago\n\n`;
+          });
+
+          if (insights && insights.length > 0) {
+            tradeDataResponse += `**📈 Market Insights:**\n`;
+            insights.forEach((insight: string) => {
+              tradeDataResponse += `• ${insight}\n`;
+            });
+          }
+
+          tradeDataResponse += `\n💡 *This data is generated in real-time to simulate live trade activity. For actual trade data, please consult official trade databases.*`;
+          
+          return tradeDataResponse;
+        } else {
+          return `📊 **No recent trade data found** for your query. Try asking about:\n\n• "Show me real-time electronics trade data"\n• "Current trade activity for textiles"\n• "Live import/export data for China"\n• "Recent trade statistics"`;
+        }
+      } catch (error) {
+        return `❌ **Error fetching trade data.** Please try again or ask about tariffs, risks, or documents instead.`;
+      }
+    }
+
+    // Check for market summary queries
+    if (
+      input.includes("market summary") ||
+      input.includes("trade summary") ||
+      input.includes("market overview") ||
+      input.includes("global trade") ||
+      input.includes("trade statistics") ||
+      input.includes("market stats")
+    ) {
+      try {
+        const response = await fetch('/api/trade-data?type=summary');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch market summary');
+        }
+
+        const summaryResponse = await response.json();
+        const { summary, timestamp } = summaryResponse;
+
+        let marketSummary = `🌍 **Global Trade Market Summary**\n\n`;
+        marketSummary += `🕐 *As of: ${new Date(timestamp).toLocaleTimeString()}*\n\n`;
+        marketSummary += `📊 **Today's Trade Activity:**\n`;
+        marketSummary += `• Total Trades: ${summary.totalTrades.toLocaleString()}\n`;
+        marketSummary += `• Total Value: $${(summary.totalValue / 1000000000).toFixed(1)}B\n`;
+        marketSummary += `• Average Risk Score: ${summary.avgRiskScore}/100\n`;
+        marketSummary += `• Market Status: ${summary.marketStatus}\n\n`;
+        
+        marketSummary += `🔥 **Top Trading Commodities:**\n`;
+        summary.topCommodities.forEach((commodity: any, index: number) => {
+          const change = commodity.change >= 0 ? `+${commodity.change}%` : `${commodity.change}%`;
+          const trend = commodity.change >= 0 ? '📈' : '📉';
+          marketSummary += `${index + 1}. ${commodity.name} - ${(commodity.volume / 1000).toFixed(0)}K units ${trend} ${change}\n`;
+        });
+
+        marketSummary += `\n💡 *This summary reflects simulated global trade activity. For official statistics, please refer to WTO or national trade agencies.*`;
+        
+        return marketSummary;
+      } catch (error) {
+        return `❌ **Error fetching market summary.** Please try again or ask specific questions about trade.`;
+      }
+    }
 
     // Check for tariff-related queries with improved matching
     if (
@@ -2948,7 +3059,7 @@ export default function ChatPage() {
     }
 
     // Default response with suggestions
-    return `I can help you with international trade questions! Try asking me about:\n\n• **Tariff rates** - "What is the tariff for exporting tea from India to USA?"\n• **Risk assessment** - "Is it risky to export silk from India to Germany?"\n• **Profitable products** - "Which products give profit in France?"\n• **Required documents** - "What documents are needed to export rice from Thailand to Japan?"\n\nI have access to 200+ products and 150+ countries in my database!`;
+    return `I can help you with international trade questions! Try asking me about:\n\n• **Real-Time Trade Data** - "Show me live trade data" or "Current trade activity"\n• **Market Summary** - "Give me a market summary" or "Global trade statistics"\n• **Tariff rates** - "What is the tariff for exporting tea from India to USA?"\n• **Risk assessment** - "Is it risky to export silk from India to Germany?"\n• **Profitable products** - "Which products give profit in France?"\n• **Required documents** - "What documents are needed to export rice from Thailand to Japan?"\n\nI have access to 200+ products, 150+ countries, and real-time trade data in my database!`;
   };
 
   const handleSendMessage = async (content: string) => {
