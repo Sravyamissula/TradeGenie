@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -499,11 +499,7 @@ export default function PartnersPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
 
-  useEffect(() => {
-    applyFilters();
-  }, [filters, searchQuery]);
-
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = partners;
 
     // Apply search query
@@ -547,7 +543,11 @@ export default function PartnersPage() {
     }
 
     setFilteredPartners(filtered);
-  };
+  }, [partners, filters, searchQuery]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters]);
 
   const handleFilterChange = (key: keyof FilterOptions, value: any) => {
     setFilters(prev => ({
