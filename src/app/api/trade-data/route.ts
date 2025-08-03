@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Sample trade data for realistic generation
 const TRADE_COMMODITIES = [
-  'Electronics', 'Textiles', 'Machinery', 'Food Products', 'Chemicals', 
+  'Electronics', 'Textiles', 'Cotton', 'Machinery', 'Food Products', 'Chemicals', 
   'Automotive Parts', 'Raw Materials', 'Medical Equipment', 'Energy Products',
-  'Agricultural Products', 'Metals', 'Plastics', 'Pharmaceuticals', 'Furniture'
+  'Agricultural Products', 'Metals', 'Plastics', 'Pharmaceuticals', 'Furniture',
+  'Silk', 'Wool', 'Coffee', 'Tea', 'Rice', 'Wheat', 'Soybeans', 'Oil Products'
 ];
 
 const COUNTRIES = [
@@ -92,6 +93,7 @@ function getUnitForCommodity(commodity: string): string {
   const units: Record<string, string> = {
     'Electronics': 'units',
     'Textiles': 'tons',
+    'Cotton': 'bales',
     'Machinery': 'units',
     'Food Products': 'tons',
     'Chemicals': 'tons',
@@ -103,7 +105,15 @@ function getUnitForCommodity(commodity: string): string {
     'Metals': 'tons',
     'Plastics': 'tons',
     'Pharmaceuticals': 'kg',
-    'Furniture': 'units'
+    'Furniture': 'units',
+    'Silk': 'tons',
+    'Wool': 'tons',
+    'Coffee': 'bags',
+    'Tea': 'kg',
+    'Rice': 'tons',
+    'Wheat': 'tons',
+    'Soybeans': 'tons',
+    'Oil Products': 'barrels'
   };
   return units[commodity] || 'units';
 }
@@ -195,10 +205,36 @@ export async function POST(request: NextRequest) {
         tradeData = tradeData.filter(trade => trade.type === 'export');
       }
 
-      // Filter by commodity mentions in query
-      const mentionedCommodity = TRADE_COMMODITIES.find(commodity =>
+      // Filter by commodity mentions in query (improved matching)
+      let mentionedCommodity = TRADE_COMMODITIES.find(commodity =>
         queryLower.includes(commodity.toLowerCase())
       );
+      
+      // Additional commodity matching for common terms
+      if (!mentionedCommodity) {
+        if (queryLower.includes('cotton')) mentionedCommodity = 'Cotton';
+        else if (queryLower.includes('textile')) mentionedCommodity = 'Textiles';
+        else if (queryLower.includes('electronic')) mentionedCommodity = 'Electronics';
+        else if (queryLower.includes('machinery') || queryLower.includes('machine')) mentionedCommodity = 'Machinery';
+        else if (queryLower.includes('chemical')) mentionedCommodity = 'Chemicals';
+        else if (queryLower.includes('metal')) mentionedCommodity = 'Metals';
+        else if (queryLower.includes('food')) mentionedCommodity = 'Food Products';
+        else if (queryLower.includes('medical')) mentionedCommodity = 'Medical Equipment';
+        else if (queryLower.includes('automotive') || queryLower.includes('auto')) mentionedCommodity = 'Automotive Parts';
+        else if (queryLower.includes('plastic')) mentionedCommodity = 'Plastics';
+        else if (queryLower.includes('pharmaceutical') || queryLower.includes('pharma')) mentionedCommodity = 'Pharmaceuticals';
+        else if (queryLower.includes('agricultural') || queryLower.includes('agri')) mentionedCommodity = 'Agricultural Products';
+        else if (queryLower.includes('energy') || queryLower.includes('oil') || queryLower.includes('petroleum')) mentionedCommodity = 'Energy Products';
+        else if (queryLower.includes('silk')) mentionedCommodity = 'Silk';
+        else if (queryLower.includes('wool')) mentionedCommodity = 'Wool';
+        else if (queryLower.includes('coffee')) mentionedCommodity = 'Coffee';
+        else if (queryLower.includes('tea')) mentionedCommodity = 'Tea';
+        else if (queryLower.includes('rice')) mentionedCommodity = 'Rice';
+        else if (queryLower.includes('wheat')) mentionedCommodity = 'Wheat';
+        else if (queryLower.includes('soybean')) mentionedCommodity = 'Soybeans';
+        else if (queryLower.includes('furniture')) mentionedCommodity = 'Furniture';
+      }
+      
       if (mentionedCommodity) {
         tradeData = tradeData.filter(trade => trade.commodity === mentionedCommodity);
       }
